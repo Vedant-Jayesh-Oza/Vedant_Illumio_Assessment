@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    if request.method :
+    if request.method == 'POST':
         lookup_file = request.files['lookup']
         flow_file = request.files['flow_logs']
         
@@ -18,7 +18,7 @@ def index():
             flow_file.save('data/flow_logs.txt')
             
             lookup_table = load_lookup_table('data/lookup.txt')
-            enriched_logs = load_flow_logs('data/flow_logs.txt')
+            enriched_logs = load_flow_logs('data/flow_logs.txt', lookup_table)
             generate_summary(enriched_logs, 'output/summary.txt')
             
             return redirect(url_for('results'))
@@ -32,7 +32,7 @@ def results():
             summary = f.read()
     except:
         summary = "No results available yet."
-    return render_template('results.html')
+    return render_template('results.html', summary=summary)
 
 if __name__ == '__main__':
     os.makedirs('data', exist_ok=True)
